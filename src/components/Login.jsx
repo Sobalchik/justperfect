@@ -13,12 +13,9 @@ const Login = () => {
     const  navigate = useNavigate();
 
     const responseGoogle = (response) => {
-        console.log(response);
 
-        localStorage.setItem('user', JSON.stringify(response.credential));
         const decoded = jwt_decode(response.credential);
-
-        console.log(decoded);
+        localStorage.setItem('user', JSON.stringify(decoded));
 
         const doc = {
             _id: decoded.sub,
