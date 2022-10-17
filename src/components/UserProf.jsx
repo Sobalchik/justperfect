@@ -69,7 +69,7 @@ const UserProf = () => {
                         />
                     </div>
                     <h1 className="font-bold text-3xl text-center mt-3">
-                        {User.name}
+                        {user.userName}
                     </h1>
                     <div className="absolute top-0 z-1 right-0 p-2">
                         {userId === User.sub && (
@@ -126,5 +126,4 @@ const UserProf = () => {
         </div>
     );
 };
-
 export default UserProf;
