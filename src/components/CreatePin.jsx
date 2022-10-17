@@ -22,7 +22,6 @@ const CreatePin = ({ user }) => {
     const uploadImage = (e) => {
         const selectedFile = e.target.files[0];
 
-        // uploading asset to sanity
         if (selectedFile.type === 'image/png' || selectedFile.type === 'image/svg' || selectedFile.type === 'image/jpeg' || selectedFile.type === 'image/gif' || selectedFile.type === 'image/tiff') {
             setWrongImageType(false);
             setLoading(true);
@@ -93,7 +92,6 @@ const CreatePin = ({ user }) => {
                             )
                         }
                         {!imageAsset ? (
-                            // eslint-disable-next-line jsx-a11y/label-has-associated-control
                             <label>
                                 <div className="flex flex-col items-center justify-center h-full">
                                     <div className="flex flex-col justify-center items-center">

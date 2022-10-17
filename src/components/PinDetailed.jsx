@@ -7,6 +7,7 @@ import { client, urlFor } from '../client';
 import MasonryLayout from './MasonryLayout';
 import { pinDetailMorePinQuery, pinDetailQuery } from '../utils/data';
 import Spinner from './Spinner';
+import { GrFormClose } from 'react-icons/gr';
 
 const PinDetail = ({ user }) => {
     const { pinId } = useParams();
@@ -14,6 +15,7 @@ const PinDetail = ({ user }) => {
     const [pinDetail, setPinDetail] = useState();
     const [comment, setComment] = useState('');
     const [addingComment, setAddingComment] = useState(false);
+    const [deletingComment, setDeletingComment] = useState(false);
 
     const fetchPinDetails = () => {
         const query = pinDetailQuery(pinId);
@@ -32,6 +34,10 @@ const PinDetail = ({ user }) => {
         }
     };
 
+    function timeout(delay) {
+        return new Promise( res => setTimeout(res, delay) );
+    }
+
     useEffect(() => {
         fetchPinDetails();
     }, [pinId]);
@@ -49,6 +55,22 @@ const PinDetail = ({ user }) => {
                     fetchPinDetails();
                     setComment('');
                     setAddingComment(false);
+                });
+        }
+    };
+
+    const  deleteComment = (key) => {
+        if (comment) {
+            const commentToRemove = [`comments[_key=="${key}"]`]
+
+            client
+                .patch(pinId)
+                .unset(commentToRemove)
+                .commit()
+                .then(() => {
+                    fetchPinDetails();
+                    setComment('');
+                    setDeletingComment(true);
                 });
         }
     };
@@ -96,6 +118,8 @@ const PinDetail = ({ user }) => {
                             <p className="font-bold">{pinDetail?.postedBy.userName}</p>
                         </Link>
                         <h2 className="mt-5 text-2xl">Comments</h2>
+
+                        {deletingComment? (<Spinner message="Deleting comment"/>) :(
                         <div className="max-h-370 overflow-y-auto">
                             {pinDetail?.comments?.map((item) => (
                                 <div className="flex gap-2 mt-5 items-center bg-white rounded-lg" key={item.comment}>
@@ -108,9 +132,33 @@ const PinDetail = ({ user }) => {
                                         <p className="font-bold">{item.postedBy?.userName}</p>
                                         <p>{item.comment}</p>
                                     </div>
+
+                                    {item.postedBy?._id===user?._id && (
+                                        <button
+
+                                            type="button"
+                                            className="mb-6 ml-12"
+                                            onClick={ () => {
+                                                setDeletingComment(true);
+
+                                                const commentToRemove = [`comments[_key=="${item._key}"]`]
+                                                client
+                                                    .patch(pinId)
+                                                    .unset(commentToRemove)
+                                                    .commit()
+                                                    .then(async () => {
+                                                        await timeout(50000);
+                                                        setDeletingComment(false)
+                                                    });
+                                            }
+                                            }
+                                        >
+                                            <GrFormClose/>
+                                        </button>
+                                        )}
                                 </div>
                             ))}
-                        </div>
+                        </div>)}
                         <div className="flex flex-wrap mt-6 gap-3">
                             <Link to={`/user-profile/${user._id}`}>
                                 <img src={user.image} className="w-10 h-10 rounded-full cursor-pointer" alt="user-profile" />
